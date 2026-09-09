@@ -395,6 +395,22 @@
   }
   .lock-card{cursor:pointer; margin-top:6px;}
   .card-amount-locked{color:var(--ink-soft);}
+  .auth-screen{
+    position:fixed; inset:0;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .auth-screen.hidden{display:none;}
+  .auth-box{width:100%; max-width:340px;}
+  .auth-box .eyebrow-lock{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
   svg{display:block;}
 </style>
 </head>
@@ -406,9 +422,14 @@
         <div class="eyebrow" id="topEyebrow">Hoy</div>
         <h1 id="topTitle">Ventas</h1>
       </div>
-      <button class="header-icon-btn" id="refreshBtn" onclick="actualizarDatos()" aria-label="Actualizar datos">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16M3 21v-5h5"/></svg>
-      </button>
+      <div style="display:flex; gap:6px;">
+        <button class="header-icon-btn" id="settingsBtn" onclick="abrirConfiguracion()" aria-label="Configuración de conexión">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="header-icon-btn" id="refreshBtn" onclick="actualizarDatos()" aria-label="Actualizar datos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16M3 21v-5h5"/></svg>
+        </button>
+      </div>
     </div>
     <div class="sub" id="topSub"></div>
   </div>
@@ -438,20 +459,77 @@
   <div class="sheet" id="sheet"></div>
 </div>
 
+<div class="auth-screen hidden" id="configScreen">
+  <div class="auth-box">
+    <div class="sheet-head" style="margin-bottom:2px;">
+      <div class="eyebrow-lock">Mi Puesto</div>
+      <button class="icon-btn" onclick="cerrarConfiguracion()" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <h2 style="font-size:23px; margin-bottom:6px;">Conectar con tu backend</h2>
+    <p class="hint" style="margin-bottom:16px;">Estos datos se guardan solo en este dispositivo, nunca se suben a GitHub ni a ningún sitio público.</p>
+    <label>URL de la aplicación web (Apps Script)</label>
+    <input type="text" id="cfgUrl" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec">
+    <label>Clave secreta (TOKEN)</label>
+    <input type="text" id="cfgToken" autocomplete="off" placeholder="La misma que pusiste en Code.gs">
+    <div id="configError" class="pin-error" style="display:none;"></div>
+    <button class="btn btn-primary" onclick="guardarConfiguracion()">Guardar y entrar</button>
+  </div>
+</div>
+
 <script>
 /* ============ Apps Script backend ============ */
-// Pega aquí la URL de tu Web App de Apps Script (Implementar → Nueva implementación → Web App)
-const API_URL = 'https://script.google.com/macros/s/AKfycbyTMNn3S70bABxtXD8mjdMECM--ymL0yFvQ0V3dyZmFP7IfEi3c8dzJRRRwzqDB30xD/exec';
-// Debe coincidir EXACTAMENTE con la constante TOKEN del script de Apps Script
-const TOKEN = 'LAVIANDADEGELO2026';
+// La URL y el token NO se guardan en este archivo: se piden una vez desde
+// la pantalla de configuración y se guardan solo en el localStorage de
+// este dispositivo, así el repositorio de GitHub puede ser público sin
+// exponer tu clave secreta.
+function getApiUrl(){ return localStorage.getItem('mp_api_url') || ''; }
+function getToken(){ return localStorage.getItem('mp_token') || ''; }
+function tieneConfiguracion(){ return !!(getApiUrl() && getToken()); }
+
+function abrirConfiguracion(){
+  document.getElementById('cfgUrl').value = getApiUrl();
+  document.getElementById('cfgToken').value = getToken();
+  document.getElementById('configError').style.display = 'none';
+  document.getElementById('configScreen').classList.remove('hidden');
+}
+
+function cerrarConfiguracion(){
+  document.getElementById('configScreen').classList.add('hidden');
+}
+
+function guardarConfiguracion(){
+  const url = document.getElementById('cfgUrl').value.trim();
+  const token = document.getElementById('cfgToken').value.trim();
+  const err = document.getElementById('configError');
+  if(!url.startsWith('https://')){
+    err.textContent = 'Pega la URL completa de tu aplicación web (empieza por https://).';
+    err.style.display = 'block';
+    return;
+  }
+  if(!token){
+    err.textContent = 'Escribe la clave secreta (TOKEN).';
+    err.style.display = 'block';
+    return;
+  }
+  localStorage.setItem('mp_api_url', url);
+  localStorage.setItem('mp_token', token);
+  cerrarConfiguracion();
+  cargarDatos(false);
+}
 
 async function cargarDatos(silencioso){
+  if(!tieneConfiguracion()){ abrirConfiguracion(); return; }
   const btn = document.getElementById('refreshBtn');
   if(btn && !silencioso) btn.classList.add('spinning');
   try{
-    const res = await fetch(`${API_URL}?action=getAll&token=${encodeURIComponent(TOKEN)}`);
+    const res = await fetch(`${getApiUrl()}?action=getAll&token=${encodeURIComponent(getToken())}`);
     const data = await res.json();
-    if(data.error){ alert('Error: ' + data.error); return; }
+    if(data.error){
+      if(!silencioso) alert('Error: ' + data.error + '\n\nRevisa la URL y la clave en el icono de ajustes ⚙️.');
+      return;
+    }
     state.ventas = data.ventas || [];
     state.reposiciones = data.reposiciones || [];
     state.ferias = data.ferias || [];
@@ -460,7 +538,7 @@ async function cargarDatos(silencioso){
     render();
   }catch(e){
     console.error('Error al cargar datos:', e);
-    if(!silencioso) alert('No se ha podido conectar. Revisa tu conexión o la URL configurada.');
+    if(!silencioso) alert('No se ha podido conectar. Revisa tu conexión o la configuración (icono ⚙️).');
   }finally{
     if(btn) btn.classList.remove('spinning');
   }
@@ -468,10 +546,10 @@ async function cargarDatos(silencioso){
 
 async function apiCall(action, payload){
   try{
-    const res = await fetch(API_URL, {
+    const res = await fetch(getApiUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita el preflight CORS con Apps Script
-      body: JSON.stringify({ action, token: TOKEN, ...payload })
+      body: JSON.stringify({ action, token: getToken(), ...payload })
     });
     const data = await res.json();
     if(data.error){ alert('Error: ' + data.error); return false; }
@@ -1128,7 +1206,7 @@ function escapeHtml(str){
 function escapeAttr(str){ return escapeHtml(str); }
 
 cargarDatos(true);
-setInterval(()=> cargarDatos(true), 8000); // refresco automático cada 8 segundos
+setInterval(()=>{ if(tieneConfiguracion()) cargarDatos(true); }, 8000); // refresco automático cada 8 segundos
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW no registrado', e)));
 }
