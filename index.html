@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#26402F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Mi Puesto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3EEE1;
+    --surface:#FFFDF7;
+    --surface-2:#EDE6D4;
+    --header:#26402F;
+    --header-text:#F3EEE1;
+    --accent:#D89B2C;
+    --accent-dark:#A9761B;
+    --ink:#242620;
+    --ink-soft:#726F5F;
+    --border:#E1D8BE;
+    --danger:#B5453A;
+    --success:#4F7A57;
+    --radius:14px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    box-shadow:0 0 40px rgba(0,0,0,0.08);
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+  }
+  /* ---------- Header ---------- */
+  .topbar{
+    background:var(--header);
+    color:var(--header-text);
+    padding:22px 20px 18px;
+    border-radius:0 0 20px 20px;
+  }
+  .topbar .eyebrow{
+    font-size:13px;
+    opacity:0.72;
+    margin-bottom:2px;
+  }
+  .topbar-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .header-icon-btn{
+    background:rgba(255,255,255,0.1);
+    border:none;
+    color:var(--header-text);
+    width:36px; height:36px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    margin-top:2px;
+  }
+  .header-icon-btn:active{background:rgba(255,255,255,0.2);}
+  .header-icon-btn.spinning svg{animation:spin .7s linear infinite;}
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  .topbar h1{
+    font-size:26px;
+    letter-spacing:0.2px;
+  }
+  .topbar .sub{
+    margin-top:6px;
+    font-size:13.5px;
+    opacity:0.85;
+  }
+  /* ---------- Content ---------- */
+  #content{
+    flex:1;
+    padding:16px 16px calc(96px + var(--safe-bottom));
+  }
+  .stat-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .stat-card{
+    flex:1;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:12px 14px;
+  }
+  .stat-card .n{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    font-weight:600;
+    color:var(--header);
+  }
+  .stat-card .l{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .section-label{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:18px 2px 8px;
+    font-weight:600;
+  }
+  .section-label:first-child{margin-top:0;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:10px;
+  }
+  .card-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .card-title{
+    font-weight:600;
+    font-size:15.5px;
+  }
+  .card-meta{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:3px;
+  }
+  .card-amount{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--header);
+    white-space:nowrap;
+  }
+  .icon-btn{
+    background:none;
+    border:none;
+    padding:6px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    border-radius:8px;
+  }
+  .icon-btn:active{background:var(--surface-2);}
+  .icon-btn.danger{color:var(--danger);}
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--ink-soft);
+  }
+  .empty h3{color:var(--ink); font-size:17px; margin-bottom:6px;}
+  .empty p{font-size:13.5px; line-height:1.5; margin:0;}
+  .progress-track{
+    height:6px;
+    background:var(--surface-2);
+    border-radius:4px;
+    overflow:hidden;
+    margin-top:8px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    border-radius:4px;
+    transition:width .25s ease;
+  }
+  .collapsible-toggle{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-family:'Work Sans',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    padding:8px 2px;
+    cursor:pointer;
+  }
+  .collapsible-toggle svg{transition:transform .2s ease;}
+  .collapsible-toggle.open svg{transform:rotate(90deg);}
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-2);
+    border-radius:20px;
+    padding:6px 8px 6px 12px;
+    font-size:13px;
+    margin:0 6px 6px 0;
+  }
+  .chip button{
+    background:var(--border);
+    border:none;
+    border-radius:50%;
+    width:18px;height:18px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .check-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 2px;
+    border-bottom:1px solid var(--border);
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-item.done .check-item-label{
+    text-decoration:line-through;
+    color:var(--ink-soft);
+  }
+  .checkbox{
+    width:24px;height:24px;
+    border-radius:7px;
+    border:2px solid var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    cursor:pointer;
+    background:var(--surface);
+  }
+  .checkbox.checked{
+    background:var(--success);
+    border-color:var(--success);
+    color:#fff;
+  }
+  .check-item-label{flex:1; font-size:14.5px;}
+  .days-badge{
+    font-size:11.5px;
+    font-weight:600;
+    padding:3px 9px;
+    border-radius:20px;
+    background:var(--surface-2);
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .days-badge.soon{background:var(--accent); color:#fff;}
+  .days-badge.today{background:var(--success); color:#fff;}
+  /* ---------- Bottom nav ---------- */
+  .bottomnav{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    display:flex;
+    padding-bottom:var(--safe-bottom);
+  }
+  .navbtn{
+    flex:1;
+    background:none;
+    border:none;
+    padding:11px 4px 9px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-family:'Work Sans',sans-serif;
+  }
+  .navbtn span{font-size:11.5px; font-weight:600;}
+  .navbtn.active{color:var(--header);}
+  /* ---------- FAB ---------- */
+  .fab{
+    position:absolute;
+    right:18px;
+    bottom:calc(78px + var(--safe-bottom));
+    width:54px;height:54px;
+    border-radius:16px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 16px rgba(216,155,44,0.45);
+    cursor:pointer;
+  }
+  .fab:active{background:var(--accent-dark);}
+  /* ---------- Sheet ---------- */
+  .sheet-overlay{
+    position:fixed; inset:0;
+    background:rgba(20,20,15,0.42);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+    opacity:1;
+    transition:opacity .18s ease;
+  }
+  .sheet-overlay.hidden{opacity:0; pointer-events:none;}
+  .sheet{
+    width:100%;
+    max-width:480px;
+    background:var(--bg);
+    border-radius:20px 20px 0 0;
+    padding:20px 20px calc(24px + var(--safe-bottom));
+    max-height:86vh;
+    overflow-y:auto;
+    transform:translateY(0);
+    transition:transform .2s ease;
+  }
+  .sheet-overlay.hidden .sheet{transform:translateY(30px);}
+  .sheet-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .sheet-head h2{font-size:19px;}
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:14px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=number], input[type=date], select{
+    width:100%;
+    padding:12px 13px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-family:'Work Sans',sans-serif;
+    font-size:15px;
+    color:var(--ink);
+  }
+  input:focus, select:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .field-row{display:flex; gap:10px;}
+  .field-row > div{flex:1;}
+  .add-row{display:flex; gap:8px; align-items:flex-end;}
+  .add-row input{flex:1;}
+  .btn{
+    width:100%;
+    padding:13px;
+    border-radius:11px;
+    border:none;
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    margin-top:18px;
+  }
+  .btn-primary{background:var(--header); color:var(--header-text);}
+  .btn-secondary{background:var(--surface-2); color:var(--ink); margin-top:8px;}
+  .btn-small{
+    width:auto;
+    margin:0;
+    padding:12px 16px;
+    background:var(--header);
+    color:var(--header-text);
+    border-radius:10px;
+  }
+  .hint{font-size:12px; color:var(--ink-soft); margin-top:4px;}
+  .pin-input{
+    letter-spacing:10px;
+    font-size:22px;
+    text-align:center;
+    font-family:'Fraunces', serif;
+  }
+  .pin-error{
+    color:var(--danger);
+    font-size:12.5px;
+    margin-top:10px;
+  }
+  .lock-card{cursor:pointer; margin-top:6px;}
+  .card-amount-locked{color:var(--ink-soft);}
+  svg{display:block;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-head">
+      <div>
+        <div class="eyebrow" id="topEyebrow">Hoy</div>
+        <h1 id="topTitle">Ventas</h1>
+      </div>
+      <button class="header-icon-btn" id="refreshBtn" onclick="actualizarDatos()" aria-label="Actualizar datos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16M3 21v-5h5"/></svg>
+      </button>
+    </div>
+    <div class="sub" id="topSub"></div>
+  </div>
+  <div id="content"><div class="empty"><p>Cargando…</p></div></div>
+
+  <button class="fab" id="fabBtn" aria-label="Añadir">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <nav class="bottomnav">
+    <button class="navbtn" data-tab="ventas">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l9 9-9.5 9.5-9-9V3.5h9.5z"/><circle cx="7.5" cy="8" r="1.3" fill="currentColor" stroke="none"/></svg>
+      <span>Ventas</span>
+    </button>
+    <button class="navbtn" data-tab="reposicion">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="7" width="12.5" height="9" rx="1.2"/><path d="M14 10h4l3.2 3.2V16H14z"/><circle cx="6" cy="18.2" r="1.7"/><circle cx="17.5" cy="18.2" r="1.7"/></svg>
+      <span>Reposición</span>
+    </button>
+    <button class="navbtn" data-tab="agenda">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.2"/><path d="M3 9.5h18M8 3v4M16 3v4"/></svg>
+      <span>Agenda</span>
+    </button>
+  </nav>
+</div>
+
+<div class="sheet-overlay hidden" id="sheetOverlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+/* ============ Apps Script backend ============ */
+// Pega aquí la URL de tu Web App de Apps Script (Implementar → Nueva implementación → Web App)
+const API_URL = 'https://script.google.com/macros/s/AKfycbyTMNn3S70bABxtXD8mjdMECM--ymL0yFvQ0V3dyZmFP7IfEi3c8dzJRRRwzqDB30xD/exec';
+// Debe coincidir EXACTAMENTE con la constante TOKEN del script de Apps Script
+const TOKEN = 'LAVIANDADEGELO2026';
+
+async function cargarDatos(silencioso){
+  const btn = document.getElementById('refreshBtn');
+  if(btn && !silencioso) btn.classList.add('spinning');
+  try{
+    const res = await fetch(`${API_URL}?action=getAll&token=${encodeURIComponent(TOKEN)}`);
+    const data = await res.json();
+    if(data.error){ alert('Error: ' + data.error); return; }
+    state.ventas = data.ventas || [];
+    state.reposiciones = data.reposiciones || [];
+    state.ferias = data.ferias || [];
+    state.pin = data.pin || null;
+    state.loaded = true;
+    render();
+  }catch(e){
+    console.error('Error al cargar datos:', e);
+    if(!silencioso) alert('No se ha podido conectar. Revisa tu conexión o la URL configurada.');
+  }finally{
+    if(btn) btn.classList.remove('spinning');
+  }
+}
+
+async function apiCall(action, payload){
+  try{
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita el preflight CORS con Apps Script
+      body: JSON.stringify({ action, token: TOKEN, ...payload })
+    });
+    const data = await res.json();
+    if(data.error){ alert('Error: ' + data.error); return false; }
+    state.ventas = data.ventas || [];
+    state.reposiciones = data.reposiciones || [];
+    state.ferias = data.ferias || [];
+    state.pin = data.pin || null;
+    render();
+    return true;
+  }catch(e){
+    console.error('Error al guardar:', e);
+    alert('No se ha podido guardar. Revisa tu conexión.');
+    return false;
+  }
+}
+
+async function actualizarDatos(){ await cargarDatos(false); }
+
+const state = { ventas: [], reposiciones: [], ferias: [], tab: 'ventas', loaded:false, pin:null, historialDesbloqueado:false };
+
+function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function todayISO(){
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off*60000).toISOString().slice(0,10);
+}
+function formatFecha(iso){
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' }).replace(/\.$/,'');
+}
+function formatEUR(n){
+  return (Number(n)||0).toLocaleString('es-ES', { style:'currency', currency:'EUR' });
+}
+function daysUntil(iso){
+  const today = new Date(todayISO()+'T00:00:00');
+  const target = new Date(iso+'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+
+document.querySelectorAll('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ state.tab = btn.dataset.tab; render(); });
+});
+document.getElementById('fabBtn').addEventListener('click', onFab);
+
+/* ============ Render dispatcher ============ */
+function render(){
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === state.tab);
+  });
+  const titles = { ventas:'Ventas', reposicion:'Reposición', agenda:'Agenda' };
+  document.getElementById('topTitle').textContent = titles[state.tab];
+  document.getElementById('topEyebrow').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long', day:'numeric', month:'long'});
+
+  if(state.tab === 'ventas') renderVentas();
+  else if(state.tab === 'reposicion') renderReposicion();
+  else renderAgenda();
+}
+
+/* ============ VENTAS ============ */
+function renderVentas(){
+  const c = document.getElementById('content');
+  const hoy = todayISO();
+  const ventasHoy = state.ventas.filter(v=>v.fecha === hoy);
+
+  if(!state.historialDesbloqueado){
+    document.getElementById('topSub').textContent = `${ventasHoy.length} venta${ventasHoy.length===1?'':'s'} hoy`;
+
+    let html = `
+      <div class="stat-row">
+        <div class="stat-card"><div class="n">${ventasHoy.length}</div><div class="l">Ventas hoy</div></div>
+      </div>
+      <div class="section-label">Hoy</div>
+    `;
+
+    if(ventasHoy.length === 0){
+      html += `<div class="empty"><h3>Sin ventas hoy todavía</h3><p>Toca el botón + para apuntar lo vendido en un mercado.</p></div>`;
+    }else{
+      ventasHoy.forEach(v=>{
+        html += ventaCardHtml(v);
+      });
+    }
+
+    html += `
+      <div class="card lock-card" onclick="solicitarPin()">
+        <div class="card-row">
+          <div>
+            <div class="card-title">Ver importes y otros días</div>
+            <div class="card-meta">Protegido con código de 4 dígitos</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+      </div>
+    `;
+    c.innerHTML = html;
+    return;
+  }
+
+  const sorted = [...state.ventas].sort((a,b)=> b.fecha.localeCompare(a.fecha));
+  const now = new Date();
+  const mesActual = now.toISOString().slice(0,7);
+  const totalMes = state.ventas.filter(v=>v.fecha.startsWith(mesActual)).reduce((s,v)=>s+Number(v.cantidad),0);
+  const totalGeneral = state.ventas.reduce((s,v)=>s+Number(v.cantidad),0);
+
+  document.getElementById('topSub').textContent = `${state.ventas.length} venta${state.ventas.length===1?'':'s'} registradas`;
+
+  let html = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="n">${formatEUR(totalMes)}</div><div class="l">Este mes</div></div>
+      <div class="stat-card"><div class="n">${formatEUR(totalGeneral)}</div><div class="l">Total registrado</div></div>
+    </div>
+    <button class="collapsible-toggle" onclick="bloquearHistorial()" style="margin-bottom:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+      Bloquear historial
+    </button>
+  `;
+
+  if(sorted.length === 0){
+    html += `<div class="empty"><h3>Sin ventas todavía</h3><p>Toca el botón + para apuntar lo vendido en un mercado.</p></div>`;
+  }else{
+    let lastDate = null;
+    sorted.forEach(v=>{
+      if(v.fecha !== lastDate){
+        html += `<div class="section-label">${formatFecha(v.fecha)}</div>`;
+        lastDate = v.fecha;
+      }
+      html += ventaCardHtml(v);
+    });
+  }
+
+  html += `
+    <button class="collapsible-toggle" onclick="abrirCambiarPin()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+      Cambiar código de acceso
+    </button>
+  `;
+
+  c.innerHTML = html;
+}
+
+function ventaCardHtml(v){
+  const importe = state.historialDesbloqueado
+    ? `<div class="card-amount">${formatEUR(v.cantidad)}</div>`
+    : `<div class="card-amount card-amount-locked"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></div>`;
+  return `
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <div class="card-title">${escapeHtml(v.mercado)}</div>
+          ${state.historialDesbloqueado ? '' : `<div class="card-meta">${formatFecha(v.fecha)}</div>`}
+        </div>
+        <div class="card-row" style="gap:10px;">
+          ${importe}
+          <button class="icon-btn danger" onclick="borrarVenta('${v.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---- código de acceso al historial ---- */
+function solicitarPin(){
+  if(!state.pin){ abrirCrearPin(); }
+  else{ abrirVerificarPin(); }
+}
+
+function bloquearHistorial(){
+  state.historialDesbloqueado = false;
+  renderVentas();
+}
+
+function pinSheetHtml(titulo, subtitulo, confirmar){
+  return `
+    <div class="sheet-head">
+      <h2>${titulo}</h2>
+      <button class="icon-btn" onclick="closeSheet()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="hint" style="margin-bottom:4px;">${subtitulo}</p>
+    <label>Código (4 dígitos)</label>
+    <input type="password" id="pin1" class="pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+    ${confirmar ? `
+      <label>Repite el código</label>
+      <input type="password" id="pin2" class="pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+    ` : ''}
+    <div id="pinError" class="pin-error" style="display:none;">Código incorrecto, inténtalo de nuevo.</div>
+  `;
+}
+
+function abrirCrearPin(){
+  document.getElementById('sheet').innerHTML = pinSheetHtml(
+    'Crea un código',
+    'Este código protegerá las ventas de días anteriores. Elige 4 dígitos.',
+    true
+  ) + `<button class="btn btn-primary" onclick="guardarPinNuevo(true)">Guardar y ver historial</button>`;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+  enfocarPrimerPin();
+}
+
+function abrirVerificarPin(){
+  document.getElementById('sheet').innerHTML = pinSheetHtml(
+    'Código de acceso',
+    'Introduce tu código de 4 dígitos para ver el historial completo.',
+    false
+  ) + `<button class="btn btn-primary" onclick="verificarPinIntento()">Ver historial</button>`;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+  enfocarPrimerPin();
+}
+
+function abrirCambiarPin(){
+  document.getElementById('sheet').innerHTML = pinSheetHtml(
+    'Cambiar código',
+    'Elige un nuevo código de 4 dígitos.',
+    true
+  ) + `<button class="btn btn-primary" onclick="guardarPinNuevo(false)">Guardar nuevo código</button>`;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+  enfocarPrimerPin();
+}
+
+function enfocarPrimerPin(){
+  const el = document.getElementById('pin1');
+  if(el) setTimeout(()=>el.focus(), 50);
+}
+
+function pinValido(v){ return /^[0-9]{4}$/.test(v); }
+
+async function guardarPinNuevo(desbloquearTrasGuardar){
+  const p1 = document.getElementById('pin1').value.trim();
+  const p2 = document.getElementById('pin2').value.trim();
+  const err = document.getElementById('pinError');
+  if(!pinValido(p1) || p1 !== p2){
+    err.textContent = 'Los códigos deben coincidir y tener 4 dígitos.';
+    err.style.display = 'block';
+    return;
+  }
+  const ok = await apiCall('setPin', { pin: p1 });
+  if(!ok) return;
+  if(desbloquearTrasGuardar) state.historialDesbloqueado = true;
+  closeSheet();
+  renderVentas();
+}
+
+function verificarPinIntento(){
+  const p1 = document.getElementById('pin1').value.trim();
+  const err = document.getElementById('pinError');
+  if(p1 === state.pin){
+    state.historialDesbloqueado = true;
+    closeSheet();
+    renderVentas();
+  }else{
+    err.style.display = 'block';
+    document.getElementById('pin1').value = '';
+    document.getElementById('pin1').focus();
+  }
+}
+
+async function borrarVenta(id){
+  if(!confirm('¿Eliminar esta venta?')) return;
+  await apiCall('deleteVenta', { id });
+}
+
+function mercadosConocidos(){
+  return [...new Set(state.ventas.map(v=>v.mercado))];
+}
+
+/* ============ REPOSICIÓN ============ */
+function renderReposicion(){
+  const c = document.getElementById('content');
+  const pendientes = state.reposiciones
+    .filter(r => r.productos.some(p=>!p.hecho))
+    .sort((a,b)=> a.fecha.localeCompare(b.fecha));
+  const completadas = state.reposiciones
+    .filter(r => r.productos.length>0 && r.productos.every(p=>p.hecho))
+    .sort((a,b)=> b.fecha.localeCompare(a.fecha));
+
+  document.getElementById('topSub').textContent = `${pendientes.length} reposición${pendientes.length===1?'':'es'} pendiente${pendientes.length===1?'':'s'}`;
+
+  let html = '';
+  if(pendientes.length === 0 && completadas.length === 0){
+    html += `<div class="empty"><h3>Sin reposiciones</h3><p>Toca + para preparar la furgoneta: elige fecha y añade los productos a reponer.</p></div>`;
+  }
+
+  pendientes.forEach(r=>{
+    const total = r.productos.length;
+    const hechos = r.productos.filter(p=>p.hecho).length;
+    const pct = total ? Math.round(hechos/total*100) : 0;
+    html += `
+      <div class="card" onclick="abrirReposicion('${r.id}')" style="cursor:pointer;">
+        <div class="card-row">
+          <div>
+            <div class="card-title">${escapeHtml(r.furgoneta)}</div>
+            <div class="card-meta">${formatFecha(r.fecha)} · ${hechos}/${total} repuesto</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--ink-soft)"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  });
+
+  if(completadas.length){
+    html += `
+      <button class="collapsible-toggle" id="toggleCompletadas" onclick="toggleCompletadas()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        Completadas (${completadas.length})
+      </button>
+      <div id="completadasList" style="display:none;">
+    `;
+    completadas.forEach(r=>{
+      html += `
+        <div class="card">
+          <div class="card-row">
+            <div>
+              <div class="card-title">${escapeHtml(r.furgoneta)}</div>
+              <div class="card-meta">${formatFecha(r.fecha)} · ${r.productos.length} productos repuestos</div>
+            </div>
+            <button class="icon-btn danger" onclick="event.stopPropagation(); borrarReposicion('${r.id}')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  c.innerHTML = html;
+}
+
+function toggleCompletadas(){
+  const list = document.getElementById('completadasList');
+  const btn = document.getElementById('toggleCompletadas');
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('open', !open);
+}
+
+async function borrarReposicion(id){
+  if(!confirm('¿Eliminar esta reposición del historial?')) return;
+  await apiCall('deleteReposicion', { id });
+}
+
+function furgonetasConocidas(){
+  return [...new Set(state.reposiciones.map(r=>r.furgoneta))];
+}
+
+function abrirReposicion(id){
+  const r = state.reposiciones.find(x=>x.id===id);
+  if(!r) return;
+  const pendientes = r.productos.filter(p=>!p.hecho);
+  let html = `
+    <div class="sheet-head">
+      <h2>${escapeHtml(r.furgoneta)}</h2>
+      <button class="icon-btn" onclick="closeSheet()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="card-meta" style="margin-bottom:14px;">${formatFecha(r.fecha)}</div>
+    <div>
+  `;
+  if(pendientes.length===0){
+    html += `<div class="empty" style="padding:20px;"><p>Todo repuesto ✓</p></div>`;
+  }else{
+    pendientes.forEach(p=>{
+      html += `
+        <div class="check-item">
+          <div class="checkbox" onclick="marcarProducto('${r.id}','${p.id}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg>
+          </div>
+          <div class="check-item-label">${escapeHtml(p.nombre)}</div>
+        </div>
+      `;
+    });
+  }
+  html += `</div>
+    <label>Añadir producto</label>
+    <div class="add-row">
+      <input type="text" id="nuevoProductoInput" placeholder="Ej. cajas de tomate">
+      <button class="btn btn-small" onclick="anadirProductoExistente('${r.id}')">Añadir</button>
+    </div>
+  `;
+  document.getElementById('sheet').innerHTML = html;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+}
+
+async function marcarProducto(repId, prodId){
+  const ok = await apiCall('marcarProducto', { id: prodId });
+  if(!ok) return;
+  const r = state.reposiciones.find(x=>x.id===repId);
+  const completa = !r || r.productos.every(x=>x.hecho);
+  if(completa){
+    closeSheet();
+  }else{
+    abrirReposicion(repId);
+  }
+}
+
+async function anadirProductoExistente(repId){
+  const input = document.getElementById('nuevoProductoInput');
+  const nombre = input.value.trim();
+  if(!nombre) return;
+  const ok = await apiCall('addProducto', { id: uid('p'), reposicionId: repId, nombre });
+  if(!ok) return;
+  abrirReposicion(repId);
+}
+
+/* ---- crear nueva reposición ---- */
+let productosTemp = [];
+
+function formReposicion(){
+  productosTemp = [];
+  const furgonetas = furgonetasConocidas();
+  let html = `
+    <div class="sheet-head">
+      <h2>Nueva reposición</h2>
+      <button class="icon-btn" onclick="closeSheet()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <label>Furgoneta</label>
+    <input type="text" id="fFurgoneta" list="furgonetasList" placeholder="Ej. Furgoneta 1">
+    <datalist id="furgonetasList">${furgonetas.map(f=>`<option value="${escapeAttr(f)}">`).join('')}</datalist>
+
+    <label>Fecha</label>
+    <input type="date" id="fFecha" value="${todayISO()}">
+
+    <label>Productos a reponer</label>
+    <div class="add-row">
+      <input type="text" id="fProducto" placeholder="Ej. cajas de fresas">
+      <button class="btn btn-small" onclick="anadirProductoTemp()">Añadir</button>
+    </div>
+    <div id="productosTempList" style="margin-top:10px;"></div>
+
+    <button class="btn btn-primary" onclick="guardarReposicion()">Crear reposición</button>
+  `;
+  document.getElementById('sheet').innerHTML = html;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+  document.getElementById('fProducto').addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); anadirProductoTemp(); }
+  });
+}
+
+function anadirProductoTemp(){
+  const input = document.getElementById('fProducto');
+  const nombre = input.value.trim();
+  if(!nombre) return;
+  productosTemp.push({ id: uid('p'), nombre, hecho:false });
+  input.value = '';
+  input.focus();
+  renderProductosTemp();
+}
+
+function quitarProductoTemp(id){
+  productosTemp = productosTemp.filter(p=>p.id!==id);
+  renderProductosTemp();
+}
+
+function renderProductosTemp(){
+  const el = document.getElementById('productosTempList');
+  if(!el) return;
+  el.innerHTML = productosTemp.map(p=>`
+    <span class="chip">${escapeHtml(p.nombre)}
+      <button onclick="quitarProductoTemp('${p.id}')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </span>
+  `).join('');
+}
+
+async function guardarReposicion(){
+  const furgoneta = document.getElementById('fFurgoneta').value.trim();
+  const fecha = document.getElementById('fFecha').value;
+  if(!furgoneta){ alert('Indica la furgoneta'); return; }
+  if(!fecha){ alert('Indica la fecha'); return; }
+  if(productosTemp.length===0){ alert('Añade al menos un producto'); return; }
+  const ok = await apiCall('addReposicion', { reposicion: { id: uid('r'), furgoneta, fecha, productos: productosTemp } });
+  if(!ok) return;
+  closeSheet();
+}
+
+/* ============ AGENDA ============ */
+function renderAgenda(){
+  const c = document.getElementById('content');
+  const hoy = todayISO();
+  const futuras = state.ferias.filter(f=>f.fecha >= hoy).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const pasadas = state.ferias.filter(f=>f.fecha < hoy).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+
+  document.getElementById('topSub').textContent = futuras.length
+    ? `Próxima: ${escapeHtml(futuras[0].nombre)}`
+    : 'Sin ferias próximas';
+
+  let html = '';
+  if(futuras.length===0 && pasadas.length===0){
+    html += `<div class="empty"><h3>Agenda vacía</h3><p>Toca + para apuntar la fecha de una feria o mercado especial.</p></div>`;
+  }
+
+  futuras.forEach(f=>{
+    const d = daysUntil(f.fecha);
+    let badge = `<span class="days-badge">${d} días</span>`;
+    if(d===0) badge = `<span class="days-badge today">Hoy</span>`;
+    else if(d<=3) badge = `<span class="days-badge soon">${d} días</span>`;
+    html += `
+      <div class="card">
+        <div class="card-row">
+          <div>
+            <div class="card-title">${escapeHtml(f.nombre)}</div>
+            <div class="card-meta">${formatFecha(f.fecha)}${f.lugar ? ' · ' + escapeHtml(f.lugar) : ''}</div>
+          </div>
+          <div class="card-row" style="gap:10px;">
+            ${badge}
+            <button class="icon-btn danger" onclick="borrarFeria('${f.id}')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  if(pasadas.length){
+    html += `
+      <button class="collapsible-toggle" id="togglePasadas" onclick="togglePasadas()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        Pasadas (${pasadas.length})
+      </button>
+      <div id="pasadasList" style="display:none;">
+    `;
+    pasadas.forEach(f=>{
+      html += `
+        <div class="card">
+          <div class="card-row">
+            <div>
+              <div class="card-title">${escapeHtml(f.nombre)}</div>
+              <div class="card-meta">${formatFecha(f.fecha)}${f.lugar ? ' · ' + escapeHtml(f.lugar) : ''}</div>
+            </div>
+            <button class="icon-btn danger" onclick="borrarFeria('${f.id}')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  c.innerHTML = html;
+}
+
+function togglePasadas(){
+  const list = document.getElementById('pasadasList');
+  const btn = document.getElementById('togglePasadas');
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('open', !open);
+}
+
+async function borrarFeria(id){
+  if(!confirm('¿Eliminar esta feria de la agenda?')) return;
+  await apiCall('deleteFeria', { id });
+}
+
+/* ============ Formularios (sheet) ============ */
+function onFab(){
+  if(state.tab==='ventas') formVenta();
+  else if(state.tab==='reposicion') formReposicion();
+  else formFeria();
+}
+
+function formVenta(){
+  const mercados = mercadosConocidos();
+  const html = `
+    <div class="sheet-head">
+      <h2>Nueva venta</h2>
+      <button class="icon-btn" onclick="closeSheet()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <label>Mercado</label>
+    <input type="text" id="vMercado" list="mercadosList" placeholder="Ej. Mercado de Oviedo">
+    <datalist id="mercadosList">${mercados.map(m=>`<option value="${escapeAttr(m)}">`).join('')}</datalist>
+
+    <div class="field-row">
+      <div>
+        <label>Fecha</label>
+        <input type="date" id="vFecha" value="${todayISO()}">
+      </div>
+      <div>
+        <label>Cantidad (€)</label>
+        <input type="number" id="vCantidad" inputmode="decimal" step="0.01" min="0" placeholder="0,00">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="guardarVenta()">Guardar venta</button>
+  `;
+  document.getElementById('sheet').innerHTML = html;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+}
+
+async function guardarVenta(){
+  const mercado = document.getElementById('vMercado').value.trim();
+  const fecha = document.getElementById('vFecha').value;
+  const cantidad = parseFloat(document.getElementById('vCantidad').value);
+  if(!mercado){ alert('Indica el mercado'); return; }
+  if(!fecha){ alert('Indica la fecha'); return; }
+  if(isNaN(cantidad) || cantidad < 0){ alert('Indica una cantidad válida'); return; }
+  const ok = await apiCall('addVenta', { venta: { id: uid('v'), mercado, fecha, cantidad } });
+  if(!ok) return;
+  closeSheet();
+}
+
+function formFeria(){
+  const html = `
+    <div class="sheet-head">
+      <h2>Nueva feria</h2>
+      <button class="icon-btn" onclick="closeSheet()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <label>Nombre</label>
+    <input type="text" id="agNombre" placeholder="Ej. Feria de Muestras">
+    <label>Fecha</label>
+    <input type="date" id="agFecha" value="${todayISO()}">
+    <label>Lugar (opcional)</label>
+    <input type="text" id="agLugar" placeholder="Ej. Gijón">
+    <button class="btn btn-primary" onclick="guardarFeria()">Guardar en agenda</button>
+  `;
+  document.getElementById('sheet').innerHTML = html;
+  document.getElementById('sheetOverlay').classList.remove('hidden');
+}
+
+async function guardarFeria(){
+  const nombre = document.getElementById('agNombre').value.trim();
+  const fecha = document.getElementById('agFecha').value;
+  const lugar = document.getElementById('agLugar').value.trim();
+  if(!nombre){ alert('Indica el nombre de la feria'); return; }
+  if(!fecha){ alert('Indica la fecha'); return; }
+  const ok = await apiCall('addFeria', { feria: { id: uid('f'), nombre, fecha, lugar } });
+  if(!ok) return;
+  closeSheet();
+}
+
+function closeSheet(){
+  document.getElementById('sheetOverlay').classList.add('hidden');
+}
+document.getElementById('sheetOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'sheetOverlay') closeSheet();
+});
+
+/* ============ utils ============ */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function escapeAttr(str){ return escapeHtml(str); }
+
+cargarDatos(true);
+setInterval(()=> cargarDatos(true), 8000); // refresco automático cada 8 segundos
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW no registrado', e)));
+}
+</script>
+</body>
+</html>
